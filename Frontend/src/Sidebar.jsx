@@ -19,7 +19,7 @@ function Sidebar() {
   const getAllThreds = async () => {
     try {
       const response = await fetch(
-        "https://chatboat-api.onrender.com/api/chat/thread"
+        "https://chatboat-api.onrender.com/api/thread"
       );
       const res = await response.json();
       const filterData = res.map((thread) => ({
@@ -51,7 +51,7 @@ function Sidebar() {
 
     try {
       const response = await fetch(
-        `https://chatboat-api.onrender.com/api/chat/thread/${newThreadId}`
+        `https://chatboat-api.onrender.com/api/thread/${newThreadId}`
       );
       const res = await response.json();
 
@@ -67,7 +67,7 @@ function Sidebar() {
   const deleteThread = async (threadId) => {
     try {
       const response = await fetch(
-        `https://chatboat-api.onrender.com/api/chat/thread/${threadId}`,
+        `https://chatboat-api.onrender.com/api/thread/${threadId}`,
         {
           method: "DELETE",
         }
