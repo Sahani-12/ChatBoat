@@ -18,7 +18,9 @@ function Sidebar() {
 
   const getAllThreds = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/thread");
+      const response = await fetch(
+        "https://chatboat-api.onrender.com/api/chat/thread"
+      );
       const res = await response.json();
       const filterData = res.map((thread) => ({
         threadId: thread.threadId,
@@ -49,7 +51,7 @@ function Sidebar() {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/thread/${newThreadId}`
+        `https://chatboat-api.onrender.com/api/chat/thread/${newThreadId}`
       );
       const res = await response.json();
 
@@ -65,7 +67,7 @@ function Sidebar() {
   const deleteThread = async (threadId) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/thread/${threadId}`,
+        `https://chatboat-api.onrender.com/api/chat/thread/${threadId}`,
         {
           method: "DELETE",
         }
@@ -87,17 +89,17 @@ function Sidebar() {
   return (
     <section className="sidebar">
       <button onClick={createNewChat}>
-        <img
-          src={logoImage}
-          alt="chatbot logo"
-          className="logo"
-        />
+        <img src={logoImage} alt="chatbot logo" className="logo" />
         <span className="fa-solid fa-pen-to-square"></span>
       </button>
 
       <ul className="history">
         {allThreads?.map((thread, idx) => (
-          <li key={idx} onClick={(e) => changeThread(thread.threadId)} className={currThreadId === thread.threadId ? 'highlighted' : ''}>
+          <li
+            key={idx}
+            onClick={(e) => changeThread(thread.threadId)}
+            className={currThreadId === thread.threadId ? "highlighted" : ""}
+          >
             {thread.title}
             <i
               className="fa-solid fa-trash"
@@ -105,7 +107,6 @@ function Sidebar() {
                 e.stopPropagation();
                 deleteThread(thread.threadId);
               }}
-              
             ></i>
           </li>
         ))}
