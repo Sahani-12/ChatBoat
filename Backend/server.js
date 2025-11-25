@@ -5,13 +5,17 @@ import cors from "cors";
 import mongoose from "mongoose";
 import chatRoutes from "./routes/chat.js";
 
+
 dotenv.config();
 const app = express();
 const PORT = 8080;
 
 // 1. Postman se JSON lene ke liye
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: ["http://localhost:5173", "https://chat-boat-six.vercel.app/"], // यहाँ अपना Vercel लिंक डालें
+    credentials: true
+}));
 
 app.use("/api", chatRoutes);
 

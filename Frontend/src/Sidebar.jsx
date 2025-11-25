@@ -2,6 +2,7 @@ import "./Sidebar.css";
 import { useContext, useEffect } from "react";
 import { MyContext } from "./MyContext";
 import { v4 as uuid } from "uuid";
+import logoImage from "../assets/blacklogo.png";
 
 function Sidebar() {
   const {
@@ -87,7 +88,7 @@ function Sidebar() {
     <section className="sidebar">
       <button onClick={createNewChat}>
         <img
-          src="src/assets/blacklogo.png"
+          src={logoImage}
           alt="chatbot logo"
           className="logo"
         />
