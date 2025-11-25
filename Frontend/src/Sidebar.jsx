@@ -2,7 +2,7 @@ import "./Sidebar.css";
 import { useContext, useEffect } from "react";
 import { MyContext } from "./MyContext";
 import { v4 as uuid } from "uuid";
-import logoImage from "../assets/blacklogo.png";
+import logoImage from "./assets/blacklogo.png";
 
 function Sidebar() {
   const {
