@@ -46,6 +46,8 @@ function Sidebar() {
     setPrevChats([]);
   };
 
+  
+
   const changeThread = async (newThreadId) => {
     setCurrThreadId(newThreadId);
 
