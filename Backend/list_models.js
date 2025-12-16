@@ -19,7 +19,7 @@ async function runDemo() {
   try {
     // Model select karo (Flash model free tier ke liye best hai)
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-flash",
+      model: "gemini-flash-lite-latest",
     });
 
     const prompt = "koi joke batao computer science ke baare mein englis mein";
