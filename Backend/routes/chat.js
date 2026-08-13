@@ -83,7 +83,7 @@ router.post("/chat", async (req, res) => {
     res.json({ reply: assistantReply });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "failed to process the chat message" });
+    res.status(500).json({ error: error.message || "failed to process the chat message" });
   }
 });
 

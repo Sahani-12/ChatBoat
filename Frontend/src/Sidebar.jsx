@@ -3,6 +3,7 @@ import { useContext, useEffect } from "react";
 import { MyContext } from "./MyContext";
 import { v4 as uuid } from "uuid";
 import logoImage from "./assets/blacklogo.png";
+import { API_BASE_URL } from "./config";
 
 function Sidebar() {
   const {
@@ -14,23 +15,27 @@ function Sidebar() {
     setReply,
     setCurrThreadId,
     setPrevChats,
+    isSidebarOpen,
+    setIsSidebarOpen,
   } = useContext(MyContext);
 
   const getAllThreds = async () => {
     try {
-      const response = await fetch(
-        "https://chatboat-api.onrender.com/api/thread"
-      );
+      const response = await fetch(`${API_BASE_URL}/api/thread`);
       const res = await response.json();
+      if (!Array.isArray(res)) {
+        setAllThreads([]);
+        return;
+      }
       const filterData = res.map((thread) => ({
         threadId: thread.threadId,
         title: thread.title,
       }));
 
-      console.log(filterData);
       setAllThreads(filterData);
     } catch (err) {
       console.log(err);
+      setAllThreads([]);
     }
   };
 
@@ -44,40 +49,33 @@ function Sidebar() {
     setReply(null);
     setCurrThreadId(uuid());
     setPrevChats([]);
+    if (typeof setIsSidebarOpen === "function") setIsSidebarOpen(false);
   };
-
-  
 
   const changeThread = async (newThreadId) => {
     setCurrThreadId(newThreadId);
+    if (typeof setIsSidebarOpen === "function") setIsSidebarOpen(false);
 
     try {
-      const response = await fetch(
-        `https://chatboat-api.onrender.com/api/thread/${newThreadId}`
-      );
+      const response = await fetch(`${API_BASE_URL}/api/thread/${newThreadId}`);
       const res = await response.json();
 
-      console.log(res);
-      setPrevChats(res);
+      setPrevChats(Array.isArray(res) ? res : []);
       setNewChat(false);
       setReply(null);
     } catch (err) {
       console.log(err);
+      setPrevChats([]);
     }
   };
 
   const deleteThread = async (threadId) => {
     try {
-      const response = await fetch(
-        `https://chatboat-api.onrender.com/api/thread/${threadId}`,
-        {
-          method: "DELETE",
-        }
-      );
-      const res = await response.json();
-      console.log(res);
+      await fetch(`${API_BASE_URL}/api/thread/${threadId}`, {
+        method: "DELETE",
+      });
       setAllThreads((prev) =>
-        prev.filter((thread) => thread.threadId !== threadId)
+        Array.isArray(prev) ? prev.filter((thread) => thread.threadId !== threadId) : []
       );
 
       if (threadId === currThreadId) {
@@ -89,35 +87,92 @@ function Sidebar() {
   };
 
   return (
-    <section className="sidebar">
-      <button onClick={createNewChat}>
-        <img src={logoImage} alt="chatbot logo" className="logo" />
-        <span className="fa-solid fa-pen-to-square"></span>
-      </button>
+    <>
+      {/* Mobile Backdrop Overlay */}
+      <div
+        className={`sidebarOverlay ${isSidebarOpen ? "active" : ""}`}
+        onClick={() => setIsSidebarOpen?.(false)}
+      ></div>
 
-      <ul className="history">
-        {allThreads?.map((thread, idx) => (
-          <li
-            key={idx}
-            onClick={(e) => changeThread(thread.threadId)}
-            className={currThreadId === thread.threadId ? "highlighted" : ""}
-          >
-            {thread.title}
-            <i
-              className="fa-solid fa-trash"
-              onClick={(e) => {
-                e.stopPropagation();
-                deleteThread(thread.threadId);
-              }}
-            ></i>
-          </li>
-        ))}
-      </ul>
+      <section className={`sidebar ${isSidebarOpen ? "open" : ""}`}>
+        {/* Top Header Nav */}
+        <div className="sidebarTop">
+          <div className="sidebarHeaderNav">
+            <div className="logoBrand" onClick={createNewChat}>
+              <div className="gptLogoIcon">
+                <img src={logoImage} alt="ChatBoat Logo" className="logoImg" />
+              </div>
+              <span className="brandName">ChatBoat</span>
+            </div>
 
-      <div className="sign">
-        <p> Anand &hearts;</p>
-      </div>
-    </section>
+            <div className="sidebarHeaderActions">
+              <button
+                className="iconBtn newChatIconBtn"
+                onClick={createNewChat}
+                title="New chat"
+              >
+                <i className="fa-regular fa-pen-to-square"></i>
+              </button>
+              <button
+                className="iconBtn closeSidebarBtn"
+                onClick={() => setIsSidebarOpen?.(false)}
+                title="Close sidebar"
+              >
+                <i className="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* History Section */}
+        <div className="historyContainer">
+          <div className="historySectionHeader">
+            <span>Chats</span>
+          </div>
+          <ul className="historyList">
+            {allThreads?.length > 0 ? (
+              allThreads.map((thread, idx) => (
+                <li
+                  key={idx}
+                  onClick={() => changeThread(thread.threadId)}
+                  className={`historyItem ${
+                    currThreadId === thread.threadId ? "active" : ""
+                  }`}
+                >
+                  <span className="threadTitle">{thread.title || "New chat"}</span>
+                  <div className="itemActions">
+                    <i
+                      className="fa-regular fa-trash-can deleteBtn"
+                      title="Delete chat"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteThread(thread.threadId);
+                      }}
+                    ></i>
+                  </div>
+                </li>
+              ))
+            ) : (
+              <div className="emptyHistory">No chat history</div>
+            )}
+          </ul>
+        </div>
+
+        {/* Bottom User Profile Footer */}
+        <div className="sidebarFooter">
+          <div className="userProfileCard">
+            <div className="userAvatarCircle">A</div>
+            <div className="userInfo">
+              <span className="userName">Anand</span>
+              <span className="userPlan">Free Plan</span>
+            </div>
+            <div className="upgradeBtn">
+              <span>Upgrade</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </>
   );
 }
 

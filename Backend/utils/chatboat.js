@@ -9,7 +9,7 @@ const getchatbotResponse = async (message) => {
       throw new Error("GEMINI_API_KEY missing");
     }
 
-    const model = "gemini-flash-lite-latest";
+    const model = "gemini-3.5-flash";
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
@@ -29,18 +29,22 @@ const getchatbotResponse = async (message) => {
 
     const data = await response.json();
 
-    // 🔐 SAFE ACCESS (MOST IMPORTANT)
+    if (data.error) {
+      console.error("Gemini API Error Details:", data.error);
+      throw new Error(data.error.message || "Invalid API Key or Gemini API error");
+    }
+
     const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!text) {
-      console.error("Gemini raw response:", data);
-      return "AI is busy right now. Please try again.";
+      console.error("Unexpected Gemini Response:", data);
+      throw new Error("Invalid response format received from Gemini API");
     }
 
     return text;
   } catch (error) {
-    console.error("Gemini API Error:", error);
-    return "AI service temporarily unavailable.";
+    console.error("Gemini API Error:", error.message);
+    throw error;
   }
 };
 
